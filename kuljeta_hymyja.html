@@ -1,0 +1,169 @@
+<html>
+    <title>Hymyä</title>
+    <style>
+        .bar {
+        width: auto;
+        display:block;
+        text-align:center;
+        position:absolute;
+        left: 30%;
+        background: transparent;
+            }
+        #bar {
+            top: 30%;
+        }
+        h1 {
+            padding-top: 10px;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            color: rgba(200,50,0,0.8);
+            font-size: 300%;
+            text-shadow: 0 0 120px rgba(0,0,20,0.8);
+        }
+        p {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 90%;
+            letter-spacing: 0.15em;
+            color: rgba(0,0,0,0.5);
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <body>
+            
+        <audio id="modem"><source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/3/33/Dial_up_modem_noises.ogg/Dial_up_modem_noises.ogg.mp3" type="audio/ogg"></audio>
+        <audio id="conga"><source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3d/Africanagogosound.ogg/Africanagogosound.ogg.ogg" type="audio/ogg"></audio>
+        <div id="bar" class="bar">
+        <h1>--,--'-(@ Hymyjä @)-`--,--</h1>
+        </div>
+        <div id="bar2" class="bar">
+                <p>kuljeta hymyjä<br/>
+                käytä näppäimiä wsad ja nuolet<br/>
+                ENTER piirtää</p>
+            </div>
+        <canvas id="my" width=500 height=500></canvas>
+
+        <script>
+            var FPS = 60;
+            var c = document.getElementById("my");
+            var ctx = c.getContext("2d");
+            ctx.canvas.width = window.innerWidth ;
+            ctx.canvas.height = window.innerHeight ;
+
+            window.setInterval(live, 1000/FPS);
+            //window.addEventListener("keydown", keypress);
+
+            var face = { 
+                x: c.width / 4, y: c.height / 2, a: 0,
+                speedx:0,speedy:0,
+                width:50,mouth:30,eye:8,
+                bg: '#ff0', fg: '#000'
+            };
+            var small = { 
+                x: c.width / 4*3, y: c.height / 2, a: 0,
+                speedx:0,speedy:0,
+                width:30,mouth:18,eye:5,
+                bg: '#420', fg: '#fff'
+            };
+
+            var leave = false;
+
+            var map = {}; // You could also use an array
+            onkeydown = onkeyup = function(e){
+                e = e || event; // to deal with IE
+                map[e.keyCode] = e.type == 'keydown';
+                /* insert conditional here */
+                
+                if( map[39] ) face.speedx +=1.5;
+                if( map[37] ) face.speedx -=1.5;
+                if( map[38] ) face.speedy -=1.5;
+                if( map[40] ) face.speedy +=1.5;
+                if( map[13] ) leave = !leave;
+
+                if( map[65] ) small.speedx -= 1;
+                if( map[68] ) small.speedx += 1;
+                if( map[87] ) small.speedy -= 1;
+                if( map[83] ) small.speedy += 1;
+            }
+            var bar_a = 0;
+            function rotate_if_hits(id,f,a,soundId) {
+                var elem = document.getElementById(id);
+                var e = elem.getBoundingClientRect();
+                if( f.x > e.left && f.x < e.right && f.y < e.bottom && f.y > e.top ) {
+                    bar_a += a;
+                    elem.style.transform = 'rotate('+bar_a+'deg)';
+                    document.getElementById(soundId).play();
+                }
+                else {
+                    document.getElementById(soundId).pause();
+                }
+            }
+
+
+
+            function smile(f) {
+
+                ctx.beginPath();
+                ctx.fillStyle = f.bg;
+                ctx.strokeStyle = "#ffffff";
+                ctx.arc(f.x,f.y,f.width,0, 360/180*Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = f.fg;
+                ctx.beginPath();
+                ctx.arc(f.x,f.y,f.mouth,f.mouth/2/180*Math.PI, 150/180*Math.PI);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.fillStyle =f.fg;
+                ctx.arc(f.x-f.mouth/2,f.y-f.eye,f.eye/2,0, 360/180*Math.PI);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.fillStyle = f.fg;
+                ctx.arc(f.x+f.mouth/2,f.y-f.eye,f.eye/2,0, 360/180*Math.PI);
+                ctx.fill();
+                ctx.stroke();
+            }
+            function slowdown(f, amount, limit) {
+                f.speedy = f.speedy/amount;
+                f.speedx = f.speedx/amount;
+                if( Math.abs(f.speedx) + Math.abs(f.speedy) < limit ) {
+                    f.speedx = 0;
+                    f.speedy = 0;
+                }
+            }
+
+
+
+
+            function slowdown2(f, amount) {
+                if( f.speedx > amount ) f.speedx -= amount;
+                if( f.speedx < amount && f.speedx > 0) f.speedx = 0;
+                if( f.speedx < -amount ) f.speedx += amount;
+                if( f.speedx > -amount && f.speedx < 0) f.speedx = 0;
+                if( f.speedy > amount ) f.speedy -= amount;
+                if( f.speedy < amount && f.speedy > 0) f.speedy = 0;
+                if( f.speedy < -amount ) f.speedy += amount;
+                if( f.speedy > -amount && f.speedy < 0) f.speedy = 0;
+            }
+            function move_and_wrap(f) {
+                f.x = (((f.x + f.speedx)  % c.width)+c.width) % c.width;
+                f.y = (((f.y + f.speedy)  % c.height)+c.height) % c.height;
+            }
+            function live() {
+                move_and_wrap(face);
+                move_and_wrap(small);
+
+                slowdown(face, 1.01, 0.001);
+                slowdown(small, 1.05, 0.0001);
+                if( !leave ) ctx.clearRect(0, 0, c.width, c.height);
+                smile(face);
+                smile(small);
+                rotate_if_hits('bar',face,1, 'modem');
+                rotate_if_hits('bar',small,-2, 'conga');
+            }
+
+        </script>
+    </body>
+</html>
