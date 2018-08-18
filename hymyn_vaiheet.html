@@ -1,0 +1,49 @@
+<html>
+    <title>Hymyä</title>
+    <style>
+        .bar {
+        width: auto;
+        display:block;
+        text-align:center;
+        position:absolute;
+        left: 30%;
+        background: transparent;
+            }
+        #bar {
+            top: 30%;
+        }
+        h1 {
+            padding-top: 10px;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            color: rgba(200,50,0,0.8);
+            font-size: 300%;
+            text-shadow: 0 0 120px rgba(0,0,20,0.8);
+        }
+        p {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 90%;
+            letter-spacing: 0.15em;
+            color: rgba(0,0,0,0.5);
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <body>
+            
+        <audio id="modem"><source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/3/33/Dial_up_modem_noises.ogg/Dial_up_modem_noises.ogg.mp3" type="audio/ogg"></audio>
+        <audio id="conga"><source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3d/Africanagogosound.ogg/Africanagogosound.ogg.ogg" type="audio/ogg"></audio>
+        <div id="bar" class="bar">
+        </div>
+        <div id="bar2" class="bar">
+                <p>hymyn vaiheet<br/>
+                ENTER vaihtaa moodia</p>
+            </div>
+        <canvas id="my" width=500 height=500></canvas>
+
+        <script src="hymyn_vaiheet.js">
+        </script>
+    </body>
+</html>
