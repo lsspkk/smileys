@@ -1,4 +1,4 @@
-var FPS = 10;
+var FPS = 60;
 var c = document.getElementById("my");
 var ctx = c.getContext("2d");
 ctx.canvas.width = window.innerWidth ;
@@ -16,7 +16,7 @@ var face = {
 };
 var leave = true;
 var changes = {
-    c: 4,
+    c: 0.5,
     happy_limit: 106,
     sad_limit: 62
 };
@@ -29,15 +29,34 @@ onkeydown = onkeyup = function(e){
     
     if( map[39] ) changes.c +=1.5;
     if( map[37] ) changes.c -=1.5;
-    if( map[13] ) leave = !leave;
+    if( map[13] ) {
+        leave = !leave;
+        ctx.clearRect(0, 0, c.width, c.height);
+        if( leave == false ) {
+            face.x = ctx.canvas.width / 2;
+            face.y = ctx.canvas.height / 2;
+            face.width = ctx.canvas.height * 0.8 / 2;
+            face.mouth = face.width * 0.6;
+            face.eye = face.width * 0.2;
+        }
+        else {
+            face.width = 50;
+            face.mouth = 30;
+            face.eye = 10;
+            face.x = face.width;
+            face.y = face.width;
+        }
+    }
 }
 var bar_a = 0;
 function draw_dot(f) {
     ctx.beginPath();
     ctx.fillStyle = f.bg;
     ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 0;
     ctx.arc(f.x,f.y,f.width,0, 360/180*Math.PI);
     ctx.fill();
+    ctx.stroke();
     draw_mouth(f);
     ctx.beginPath();
     ctx.fillStyle =f.fg;
@@ -52,15 +71,16 @@ function draw_dot(f) {
 }
 function draw_mouth(f) {
     ctx.strokeStyle = f.fg;
+    ctx.lineWidth = f.width / 30;
     ctx.beginPath();
     if( f.smile > changes.sad_limit ) {
-        deltay = -1* (10*f.mouth -((f.smile) * f.mouth/12.1 ));
-        deltaa = 88 - 5*Math.pow(f.smile*f.mouth/30*0.0124,9)-Math.pow(f.smile*f.mouth/35*0.011,2);
-        ctx.arc(f.x, f.y+deltay+f.mouth/2.6+Math.pow(f.smile*0.046,2), Math.abs(deltay), deltaa / 180 * Math.PI, (180-deltaa) / 180 * Math.PI);
+        deltay = -1* (10*f.mouth-((f.smile) * f.mouth / 12 ));
+        deltaa = 88 - 5*Math.pow(f.smile*0.0124,9)-Math.pow(f.smile*0.011,2);
+        ctx.arc(f.x, f.y+deltay+f.mouth/1.6+Math.pow((f.smile-changes.sad_limit)*0.015,2)*f.mouth, Math.abs(deltay), deltaa / 180 * Math.PI, (180-deltaa) / 180 * Math.PI);
     } else {
         deltay = (10*f.mouth -((-f.smile) * f.mouth/12.1 ));
-        deltaa = 88 - 5*Math.pow(f.smile*f.mouth/30*0.0124,9)-Math.pow(f.smile*f.mouth/35*0.011,2);
-        ctx.arc(f.x, f.y+deltay+f.mouth/1.1-Math.pow(f.smile*0.046,2), Math.abs(deltay), (355-deltaa) / 180 * Math.PI, (185+deltaa) / 180 * Math.PI);
+        deltaa = 88 - 5*Math.pow(f.smile*0.012,9)-Math.pow(f.smile*0.01,2);
+        ctx.arc(f.x, f.y+deltay+f.mouth/1.6-Math.pow((f.smile+changes.sad_limit)*0.01,2)*f.mouth, Math.abs(deltay), (355-deltaa) / 180 * Math.PI, (185+deltaa) / 180 * Math.PI);
     }
     //    console.log(f.smile, deltay, deltaa);
     ctx.stroke();
@@ -68,15 +88,16 @@ function draw_mouth(f) {
 
 
 function move(f) {
+    if( leave == false ) return;
     f.x = f.x+f.width*2;
     if( f.x > ctx.canvas.width ) { 
         f.x = 0+f.width;
         f.y = f.y + f.width*2;
     }
     if( f.y > ctx.canvas.height ) {
-        if( !leave ) ctx.clearRect(0, 0, c.width, c.height);
         f.y = 0+f.width;
     }
+    //if( !leave ) ctx.clearRect(0, 0, c.width, c.height);
 }
 function change_smile(f) {
     if( (f.smile  + changes.c <= changes.sad_limit && f.smile > changes.sad_limit) ||
@@ -90,9 +111,11 @@ function change_smile(f) {
  
 }
 function live() {
-    move(face)
-    if( !leave ) ctx.clearRect(0, 0, c.width, c.height);
-    draw_dot(face);
+    for( i=0; i < 100; i++) {
+        move(face)
+        draw_dot(face);
+    }
     change_smile(face);
+
 }
 
