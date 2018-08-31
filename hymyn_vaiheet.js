@@ -16,7 +16,7 @@ var face = {
 };
 var leave = true;
 var changes = {
-    c: 0.5,
+    c: 0.1,
     happy_limit: 106,
     sad_limit: 62
 };
@@ -49,11 +49,11 @@ onkeydown = onkeyup = function(e){
     }
 }
 var bar_a = 0;
-function draw_dot(f) {
+function draw_function(f) {
     ctx.beginPath();
     ctx.fillStyle = f.bg;
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 0;
+    ctx.strokeStyle = "transparent";
+    ctx.lineWidth = 1;
     ctx.arc(f.x,f.y,f.width,0, 360/180*Math.PI);
     ctx.fill();
     ctx.stroke();
@@ -113,7 +113,7 @@ function change_smile(f) {
 function live() {
     for( i=0; i < 100; i++) {
         move(face)
-        draw_dot(face);
+        draw_function(face);
     }
     change_smile(face);
 
